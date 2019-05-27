@@ -34,13 +34,23 @@ export class AppComponent implements OnInit {
       // {transactionConfirmationBlocks: 1, protocol: []}
     );
     const dfs = new bcc.Ipfs({remoteNode: new IpfsApi(ipfsConfig)});
+
+    const formattedContracts = {};
+    Object.keys(smartcontracts).forEach((key) => {
+        const contractKey = (key.indexOf(':') !== -1) ? key.split(':')[1] : key;
+        formattedContracts[contractKey] = smartcontracts[key];
+    });  
+
     // create runtime
     const runtime = await bcc.createDefaultRuntime(web3, dfs, {
       mnemonic: 'leave best ship pulp hospital used damp decorate say mobile glance dilemma',
       password: 'T1234567',
     }, {
-      contracts: smartcontracts,
+      contracts: formattedContracts,
     });
     console.dir(runtime);
-  }
+
+    await runtime.profile.loadForAccount('publicKey');
+    console.log(await runtime.profile.getPublicKey());
+    }
 }
